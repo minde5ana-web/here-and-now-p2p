@@ -191,213 +191,104 @@
 </div>
 
 <script>
-    // State Management
-    let currentUser = JSON.parse(localStorage.getItem('hn_user')) || null;
-    let users = JSON.parse(localStorage.getItem('hn_users')) || [];
-    let posts = JSON.parse(localStorage.getItem('hn_posts')) || [];
-    let activeAuthMode = 'signup';
-    let selectedRole = null;
-    let activePostId = null;
+   // --- აქედან იწყება ჩასანაცვლებელი კოდი ---
 
-    // Initialization
-    window.onload = () => {
-        if(currentUser) updateUI();
-        renderPosts();
-    };
+let currentUser = JSON.parse(localStorage.getItem('hn_user')) || null;
+let posts = JSON.parse(localStorage.getItem('hn_posts')) || [];
 
-    // UI Functions
-    function openModal(id, mode) {
-        if(id === 'auth-modal') {
-            activeAuthMode = mode;
-            document.getElementById('auth-title').innerText = mode === 'signup' ? 'რეგისტრაცია' : 'შესვლა';
-            document.getElementById('signup-only').className = mode === 'signup' ? '' : 'hidden';
-            document.querySelector('.role-picker').className = mode === 'signup' ? 'role-picker' : 'role-picker hidden';
-        }
-        document.getElementById(id).classList.add('active');
-    }
+window.onload = () => { 
+    if(currentUser) updateUI(); 
+    renderFeed(); 
+    if(currentUser && currentUser.role === 'seller') renderSellerDashboard();
+};
 
-    function closeModals() {
-        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
-    }
+// 1. გამყიდველის პანელი (სადაც ხედავს მყიდველის რეაქციას)
+function renderSellerDashboard() {
+    const dash = document.getElementById('seller-tools'); // ან შესაბამისი ID რაც გაქვს
+    if(!dash) return;
+    
+    let html = `<h3>ჩემი შეთავაზებების სტატუსი</h3><div style="display:grid; gap:10px; margin-top:10px;">`;
+    let hasOffers = false;
 
-    function selectRole(role) {
-        selectedRole = role;
-        document.getElementById('role-buyer').classList.toggle('active', role === 'buyer');
-        document.getElementById('role-seller').classList.toggle('active', role === 'seller');
-    }
-
-    // Logic: Authentication
-    function handleAuth() {
-        const email = document.getElementById('auth-email').value;
-        const pass = document.getElementById('auth-pass').value;
-        const username = document.getElementById('auth-username').value;
-
-        if(activeAuthMode === 'signup') {
-            if(!selectedRole) return alert("აირჩიეთ როლი!");
-            const user = { email, pass, username, role: selectedRole, rating: 5.0, deals: 0 };
-            users.push(user);
-            localStorage.setItem('hn_users', JSON.stringify(users));
-            currentUser = user;
-        } else {
-            const user = users.find(u => u.email === email && u.pass === pass);
-            if(!user) return alert("არასწორი მონაცემები!");
-            currentUser = user;
-        }
-
-        localStorage.setItem('hn_user', JSON.stringify(currentUser));
-        location.reload();
-    }
-
-    function logout() {
-        localStorage.removeItem('hn_user');
-        location.reload();
-    }
-
-    function updateUI() {
-        document.getElementById('nav-guest').classList.add('hidden');
-        document.getElementById('nav-user').classList.remove('hidden');
-        document.getElementById('display-name').innerText = currentUser.username;
-        const badge = document.getElementById('display-role-badge');
-        badge.innerText = currentUser.role === 'buyer' ? 'მყიდველი' : 'გამყიდველი';
-        badge.className = 'user-role-badge ' + (currentUser.role === 'buyer' ? 'role-buyer' : 'role-seller');
-        document.getElementById('display-rating').innerText = currentUser.rating.toFixed(1);
-        
-        if(currentUser.role === 'buyer') {
-            document.getElementById('action-bar').classList.remove('hidden');
-        }
-    }
-
-    // Logic: Posts
-    function submitPost() {
-        const post = {
-            id: Date.now(),
-            title: document.getElementById('p-title').value,
-            qty: document.getElementById('p-qty').value,
-            comment: document.getElementById('p-comment').value,
-            file: document.getElementById('p-file').value,
-            owner: currentUser.email,
-            ownerName: currentUser.username,
-            rating: currentUser.rating,
-            offers: [],
-            status: 'active'
-        };
-        posts.unshift(post);
-        saveAndRender();
-        closeModals();
-    }
-
-    function renderPosts() {
-        const feed = document.getElementById('main-feed');
-        feed.innerHTML = posts.length === 0 ? '<p style="text-align:center; color:gray;">განცხადებები არ არის</p>' : '';
-
-        posts.forEach(p => {
-            const isMyPost = currentUser && p.owner === currentUser.email;
-            const canOffer = currentUser && currentUser.role === 'seller';
-            
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="post-header">
-                    <div>
-                        <div class="post-title">${p.title}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted)">რაოდენობა: ${p.qty}</div>
+    posts.forEach(p => {
+        p.offers.forEach(o => {
+            if(o.sellerEmail === currentUser.email) {
+                hasOffers = true;
+                html += `
+                <div class="card" style="border-left: 5px solid ${getStatusColor(o.status)}">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>პოსტი: <b>${p.title}</b> | ფასი: <b>${o.price}</b></span>
+                        <span>სტატუსი: <b style="color:${getStatusColor(o.status)}">${o.status}</b></span>
                     </div>
-                    <div class="rating-box">
-                        <i class="fas fa-star"></i> ${p.rating.toFixed(1)} 
-                        <span style="color:var(--text-muted); font-size: 0.75rem">(${p.ownerName})</span>
+                    <div style="margin-top:10px;">
+                        ${o.status === 'accepted' ? `<button class="btn btn-s" onclick="finalConfirm('${p.id}', '${o.id}', 'seller')">საბოლოო დასტური (გამყიდველი)</button>` : ''}
+                        ${o.status === 'rejected' ? `<button class="btn btn-outline" onclick="openOffer('${p.id}')">თავიდან გაგზავნა</button>` : ''}
+                        ${o.status === 'counter' ? `<span>მყიდველმა შემოგთავაზათ სხვა ფასი. <button class="btn btn-s" onclick="updateStatus('${p.id}', '${o.id}', 'accepted')">დათანხმება</button></span>` : ''}
                     </div>
-                </div>
-                <p style="font-size: 0.9rem; margin-bottom: 1rem;">${p.comment}</p>
-                ${p.file ? `<a href="${p.file}" target="_blank" style="font-size:0.8rem; color:var(--primary); display:block; margin-bottom:1rem;"><i class="fas fa-paperclip"></i> ფაილის ნახვა</a>` : ''}
-                
-                <div id="post-actions-${p.id}">
-                    ${isMyPost ? 
-                        `<button class="btn btn-outline" onclick="viewOffers(${p.id})">${p.offers.length} შეთავაზება</button>` : 
-                        (canOffer ? `<button class="btn btn-p" onclick="initOffer(${p.id})">შეთავაზება</button>` : `<div style="font-size:0.8rem; color:gray">შედით როგორც გამყიდველი შეთავაზებისთვის</div>`)
-                    }
-                </div>
-            `;
-            feed.appendChild(card);
+                </div>`;
+            }
         });
+    });
+    
+    html += hasOffers ? `</div>` : `<p>ჯერ შეთავაზებები არ გაგიკეთებიათ</p></div>`;
+    dash.innerHTML = html;
+}
+
+// 2. სტატუსების ფერების მართვა
+function getStatusColor(status) {
+    switch(status) {
+        case 'accepted': return '#10B981';
+        case 'rejected': return '#EF4444';
+        case 'pending': return '#F59E0B';
+        case 'completed': return '#0052FF';
+        default: return '#64748B';
+    }
+}
+
+// 3. სტატუსის განახლება (მყიდველის მიერ)
+function updateStatus(pid, oid, stat) {
+    const pIdx = posts.findIndex(x => x.id == pid);
+    const oIdx = posts[pIdx].offers.findIndex(x => x.id == oid);
+    
+    posts[pIdx].offers[oIdx].status = stat;
+    
+    // თუ მყიდველმა დაადასტურა, გამყიდველს უნდა მიუვიდეს შეტყობინება (სტატუსის სახით)
+    save();
+    location.reload(); 
+}
+
+// 4. საბოლოო დასტურის ლოგიკა (ორივე მხარისთვის)
+function finalConfirm(pid, oid, role) {
+    const pIdx = posts.findIndex(x => x.id == pid);
+    const oIdx = posts[pIdx].offers.findIndex(x => x.id == oid);
+    
+    if(role === 'seller') {
+        posts[pIdx].offers[oIdx].sellerFinal = true;
+        posts[pIdx].offers[oIdx].status = 'საკოლოო დასტური (გამყიდველი)';
+    } else {
+        posts[pIdx].offers[oIdx].buyerFinal = true;
     }
 
-    // Logic: Trading
-    function initOffer(pid) {
-        activePostId = pid;
-        openModal('offer-modal');
+    // თუ ორივემ დაადასტურა - იხსნება შეფასება
+    if(posts[pIdx].offers[oIdx].sellerFinal && posts[pIdx].offers[oIdx].buyerFinal) {
+        posts[pIdx].offers[oIdx].status = 'completed';
+        openRatingModal(pid, oid); 
     }
+    
+    save();
+    location.reload();
+}
 
-    function sendOffer() {
-        const pIdx = posts.findIndex(p => p.id === activePostId);
-        const offer = {
-            id: Date.now(),
-            sellerEmail: currentUser.email,
-            sellerName: currentUser.username,
-            sellerRating: currentUser.rating,
-            price: document.getElementById('o-price').value + ' ' + document.getElementById('o-curr').value,
-            comment: document.getElementById('o-comment').value,
-            file: document.getElementById('o-file').value,
-            status: 'pending' // pending, rejected, counter, accepted, final_pending, completed
-        };
-        posts[pIdx].offers.push(offer);
-        saveAndRender();
-        closeModals();
-        alert("შეთავაზება გაიგზავნა!");
-    }
+// 5. Binance-ის სტილის შეფასების ფანჯრის გახსნა
+function openRatingModal(pid, oid) {
+    // აქ იხსნება შენი Rating Modal, რომელიც უკვე გაქვს დიზაინში
+    const modal = document.getElementById('rating-modal');
+    if(modal) modal.classList.add('active');
+}
 
-    function viewOffers(pid) {
-        activePostId = pid;
-        const post = posts.find(p => p.id === pid);
-        const content = document.getElementById('trade-content');
-        content.innerHTML = `<h3>შემოსული შეთავაზებები</h3><div style="margin:1rem 0"></div>`;
-        
-        post.offers.forEach(o => {
-            const div = document.createElement('div');
-            div.style.padding = '15px';
-            div.style.border = '1px solid #E2E8F0';
-            div.style.borderRadius = '12px';
-            div.style.marginBottom = '10px';
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between">
-                    <b>${o.sellerName} <span style="color:#F59E0B">★${o.sellerRating.toFixed(1)}</span></b>
-                    <b style="color:var(--primary)">${o.price}</b>
-                </div>
-                <p style="font-size:0.85rem; margin:5px 0">${o.comment}</p>
-                <div style="display:flex; gap:10px; margin-top:10px">
-                    ${o.status === 'pending' ? `
-                        <button class="btn btn-p" onclick="updateOfferStatus(${o.id}, 'accepted')">დადასტურება</button>
-                        <button class="btn btn-outline" onclick="updateOfferStatus(${o.id}, 'rejected')">უარყოფა</button>
-                    ` : `<b>სტატუსი: ${o.status}</b>`}
-                </div>
-            `;
-            content.appendChild(div);
-        });
-        content.innerHTML += `<button class="btn btn-ghost" style="width:100%" onclick="closeModals()">დახურვა</button>`;
-        openModal('trade-modal');
-    }
+function save() { localStorage.setItem('hn_posts', JSON.stringify(posts)); }
 
-    function updateOfferStatus(oid, status) {
-        const pIdx = posts.findIndex(p => p.id === activePostId);
-        const oIdx = posts[pIdx].offers.findIndex(o => o.id === oid);
-        posts[pIdx].offers[oIdx].status = status;
-        
-        if(status === 'accepted') {
-            // Logic for Double Confirmation starts here
-            posts[pIdx].offers[oIdx].status = 'final_pending';
-        }
-        
-        saveAndRender();
-        viewOffers(activePostId);
-    }
-
-    function saveAndRender() {
-        localStorage.setItem('hn_posts', JSON.stringify(posts));
-        renderPosts();
-    }
-
-    // NOTE: This is a base prototype. 
-    // Rating logic, PDF generation and Binance-style feedback will be detailed in the next iteration 
-    // once you test this flow.
+// --- აქ მთავრდება ჩასანაცვლებელი კოდი ---
 </script>
 
 </body>
