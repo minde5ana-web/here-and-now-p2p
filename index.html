@@ -7,289 +7,288 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
         :root {
-            --primary: #0052FF;
-            --dark: #0F172A;
-            --bg: #F8FAFC;
-            --white: #FFFFFF;
-            --success: #10B981;
-            --danger: #EF4444;
-            --text-main: #1E293B;
-            --text-muted: #64748B;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            --primary: #0052FF; --dark: #0F172A; --bg: #F8FAFC; --white: #FFFFFF;
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B;
+            --text-main: #1E293B; --text-muted: #64748B; --shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.6; }
-
-        /* Navigation */
-        nav {
-            background: var(--white);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo-box { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-        .logo-circle {
-            width: 40px; height: 40px; background: var(--primary); 
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 1.2rem;
-        }
-        .logo-text { font-size: 1.5rem; font-weight: 800; color: var(--dark); letter-spacing: -1px; }
-        .logo-text span { color: var(--primary); }
-
-        .nav-auth { display: flex; gap: 15px; align-items: center; }
-        .user-info { display: flex; flex-direction: column; align-items: flex-end; }
-        .user-name { font-weight: 700; font-size: 0.9rem; }
-        .user-role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; font-weight: 800; }
-        .role-buyer { background: #E0E7FF; color: #4338CA; }
-        .role-seller { background: #DCFCE7; color: #15803D; }
-
-        /* Buttons */
-        .btn { padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; font-size: 0.9rem; }
-        .btn-p { background: var(--primary); color: white; }
-        .btn-p:hover { background: #0041CC; }
-        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .btn-ghost { color: var(--text-muted); }
-
-        /* Main Content */
-        .container { max-width: 1100px; margin: 2rem auto; padding: 0 20px; }
-        .hero-section { text-align: center; margin-bottom: 3rem; }
-        .hero-section h1 { font-size: 2.5rem; color: var(--dark); margin-bottom: 1rem; }
-
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); }
+        nav { background: var(--white); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .logo-box { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--dark); font-weight: 800; font-size: 1.4rem; }
+        .logo-circle { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 20px; }
         .card { background: var(--white); border-radius: 16px; padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; border: 1px solid rgba(0,0,0,0.05); }
-        .post-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #F1F5F9; padding-bottom: 1rem; margin-bottom: 1rem; }
-        .post-title { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
-        .rating-box { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: #F59E0B; }
-
-        /* Modals */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
+        .btn { padding: 0.7rem 1.4rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-p { background: var(--primary); color: white; }
+        .btn-s { background: var(--success); color: white; }
+        .btn-d { background: var(--danger); color: white; }
+        .btn-outline { background: transparent; border: 2px solid #E2E8F0; color: var(--text-main); }
+        .badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase; }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        .status-accepted { background: #DCFCE7; color: #166534; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: var(--white); width: 100%; max-width: 500px; border-radius: 20px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
-        
-        .role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 1.5rem 0; }
-        .role-btn { padding: 1rem; border: 2px solid #E2E8F0; border-radius: 12px; cursor: pointer; text-align: center; transition: 0.3s; }
-        .role-btn.active { border-color: var(--primary); background: #F0F7FF; }
-        .role-btn i { font-size: 1.5rem; margin-bottom: 8px; color: var(--primary); }
-
-        label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-        input, select, textarea { width: 100%; padding: 0.8rem; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1rem; font-family: inherit; }
-        
+        .modal-content { background: var(--white); width: 100%; max-width: 500px; border-radius: 24px; padding: 2rem; max-height: 90vh; overflow-y: auto; }
+        input, textarea, select { width: 100%; padding: 0.9rem; border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 1rem; font-family: inherit; }
+        .file-label { display: block; padding: 1rem; border: 2px dashed #E2E8F0; border-radius: 12px; text-align: center; cursor: pointer; margin-bottom: 1rem; transition: 0.3s; }
         .hidden { display: none !important; }
-
-        /* Binance Style Rating Section */
-        .rating-stars { display: flex; gap: 10px; justify-content: center; margin: 1rem 0; font-size: 1.5rem; color: #E2E8F0; }
-        .rating-stars i.active { color: #F59E0B; }
-
+        .offer-card { border-left: 4px solid var(--primary); padding: 1rem; background: #F8FAFC; border-radius: 0 12px 12px 0; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="#" class="logo-box">
-        <div class="logo-circle">H</div>
-        <div class="logo-text">HERE<span>&NOW</span></div>
-    </a>
-    
-    <div id="nav-guest" class="nav-auth">
-        <button class="btn btn-ghost" onclick="openModal('auth-modal', 'login')">შესვლა</button>
-        <button class="btn btn-p" onclick="openModal('auth-modal', 'signup')">რეგისტრაცია</button>
-    </div>
-
-    <div id="nav-user" class="nav-auth hidden">
-        <div class="user-info">
-            <div class="user-name" id="display-name">გიორგი</div>
-            <div id="display-role-badge" class="user-role-badge">მყიდველი</div>
-            <div class="rating-box"><i class="fas fa-star"></i> <span id="display-rating">5.0</span></div>
+    <a href="#" class="logo-box"><div class="logo-circle">H</div> HERE<span>&NOW</span></a>
+    <div id="nav-user" class="hidden">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="text-align: right;">
+                <div id="user-display-name" style="font-weight: 700;"></div>
+                <div id="user-display-role" class="badge"></div>
+            </div>
+            <button class="btn btn-outline" onclick="logout()"><i class="fas fa-power-off"></i></button>
         </div>
-        <button class="btn btn-outline" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+    <div id="nav-guest">
+        <button class="btn btn-p" onclick="openModal('auth-modal')">შესვლა / რეგისტრაცია</button>
     </div>
 </nav>
 
 <div class="container">
-    <header class="hero-section">
-        <h1>ბაზარი <span>Here & Now</span></h1>
-        <p>იპოვე, შესთავაზე, დაადასტურე - სწრაფად და საიმედოდ.</p>
-    </header>
-
-    <div id="action-bar" class="hidden" style="margin-bottom: 2rem;">
-        <button class="btn btn-p" onclick="openModal('post-modal')"><i class="fas fa-plus"></i> მოთხოვნის დამატება</button>
+    <div id="buyer-tools" class="hidden" style="margin-bottom: 2rem;">
+        <button class="btn btn-p" onclick="openModal('post-modal')"><i class="fas fa-plus"></i> ახალი მოთხოვნა</button>
     </div>
 
-    <div id="main-feed">
-        </div>
+    <div id="seller-dashboard" class="hidden" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem;">ჩემი შეთავაზებების სტატუსი</h3>
+        <div id="my-offers-list"></div>
+        <hr style="margin: 2rem 0; opacity: 0.1;">
+    </div>
+
+    <h2 style="margin-bottom: 1.5rem;">აქტიური ბაზარი</h2>
+    <div id="main-feed"></div>
 </div>
 
 <div id="auth-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2 id="auth-title">რეგისტრაცია</h2>
-        <div class="role-picker">
-            <div class="role-btn" id="role-buyer" onclick="selectRole('buyer')">
-                <i class="fas fa-shopping-cart"></i><br>მყიდველი
-            </div>
-            <div class="role-btn" id="role-seller" onclick="selectRole('seller')">
-                <i class="fas fa-store"></i><br>გამყიდველი
-            </div>
+        <h2>ავტორიზაცია</h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">აირჩიეთ როლი და შეავსეთ მონაცემები</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem;">
+            <button class="btn btn-outline" id="role-b" onclick="setRole('buyer')">მყიდველი</button>
+            <button class="btn btn-outline" id="role-s" onclick="setRole('seller')">გამყიდველი</button>
         </div>
-        <div id="signup-only">
-            <label>იუზერ ნეიმი</label>
-            <input type="text" id="auth-username" placeholder="მაგ: giorgi77">
-        </div>
-        <label>ელ-ფოსტა</label>
-        <input type="email" id="auth-email" placeholder="email@example.com">
-        <label>პაროლი</label>
-        <input type="password" id="auth-pass" placeholder="******">
-        
-        <button class="btn btn-p" style="width: 100%;" onclick="handleAuth()">დადასტურება</button>
-        <button class="btn btn-ghost" style="width: 100%; margin-top: 10px;" onclick="closeModals()">გაუქმება</button>
+        <input type="text" id="auth-user" placeholder="თქვენი სახელი">
+        <input type="email" id="auth-email" placeholder="ელ-ფოსტა">
+        <input type="password" id="auth-pass" placeholder="პაროლი">
+        <button class="btn btn-p" style="width: 100%;" onclick="handleAuth()">შესვლა / რეგისტრაცია</button>
+        <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="closeModals()">გაუქმება</button>
     </div>
 </div>
 
 <div id="post-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>ახალი მოთხოვნა</h2>
-        <label>პროდუქცია / სერვისი</label>
-        <input type="text" id="p-title" placeholder="მაგ: არმატურა 12მმ">
-        <label>რაოდენობა</label>
-        <input type="text" id="p-qty" placeholder="მაგ: 5 ტონა">
-        <label>კომენტარი</label>
-        <textarea id="p-comment" rows="3" placeholder="დამატებითი დეტალები..."></textarea>
-        <label>ფაილის მიმაგრება (URL)</label>
-        <input type="text" id="p-file" placeholder="ბმული ფაილზე">
-        <button class="btn btn-p" style="width:100%" onclick="submitPost()">ბაზარზე განთავსება</button>
-        <button class="btn btn-ghost" style="width:100%; margin-top: 10px;" onclick="closeModals()">გაუქმება</button>
+        <h2>ახალი განაცხადი</h2>
+        <input type="text" id="p-title" placeholder="რა გჭირდებათ? (პროდუქცია/სერვისი)">
+        <input type="text" id="p-qty" placeholder="რაოდენობა">
+        <textarea id="p-comm" placeholder="დამატებითი კომენტარი..."></textarea>
+        <label class="file-label">
+            <i class="fas fa-cloud-upload-alt"></i> მიაბით ფაილი
+            <input type="file" id="p-file" class="hidden" onchange="handleFile(this, 'p-file-status')">
+        </label>
+        <div id="p-file-status" style="font-size: 0.8rem; color: var(--success); margin-bottom: 1rem;"></div>
+        <button class="btn btn-p" style="width: 100%;" onclick="addPost()">ბაზარზე განთავსება</button>
     </div>
 </div>
 
 <div id="offer-modal" class="modal-overlay">
     <div class="modal-content">
-        <h2>შეთავაზების გაგზავნა</h2>
-        <label>ფასი</label>
+        <h2>თქვენი შეთავაზება</h2>
         <div style="display: flex; gap: 10px;">
-            <input type="number" id="o-price" style="flex: 2;">
+            <input type="number" id="o-price" placeholder="ფასი" style="flex: 2;">
             <select id="o-curr" style="flex: 1;"><option>GEL</option><option>USD</option></select>
         </div>
-        <label>კომენტარი</label>
-        <textarea id="o-comment" rows="3"></textarea>
-        <label>ფაილის მიმაგრება (URL)</label>
-        <input type="text" id="o-file">
-        <button class="btn btn-p" style="width:100%" onclick="sendOffer()">შეთავაზების გაგზავნა</button>
-        <button class="btn btn-ghost" style="width:100%; margin-top: 10px;" onclick="closeModals()">გაუქმება</button>
+        <textarea id="o-comm" placeholder="თქვენი პირობები..."></textarea>
+        <label class="file-label">
+            <i class="fas fa-file-invoice-dollar"></i> მიაბით ფაილი (ინვოისი)
+            <input type="file" id="o-file" class="hidden" onchange="handleFile(this, 'o-file-status')">
+        </label>
+        <div id="o-file-status" style="font-size: 0.8rem; color: var(--success); margin-bottom: 1rem;"></div>
+        <button class="btn btn-p" style="width: 100%;" onclick="submitOffer()">გაგზავნა მყიდველთან</button>
     </div>
 </div>
 
-<div id="trade-modal" class="modal-overlay">
-    <div class="modal-content" id="trade-content">
+<div id="rating-modal" class="modal-overlay">
+    <div class="modal-content" style="text-align: center;">
+        <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> გარიგება დასრულდა!</h2>
+        <p style="margin: 1rem 0;">შეაფასეთ პარტნიორი (Binance P2P ლოგიკა)</p>
+        <div style="display: flex; gap: 15px; margin-bottom: 1.5rem;">
+            <button class="btn btn-outline" style="flex: 1; border-color: var(--success);" onclick="alert('მადლობა შეფასებისთვის!')">👍 პოზიტიური</button>
+            <button class="btn btn-outline" style="flex: 1; border-color: var(--danger);" onclick="alert('შეფასება მიღებულია')">👎 ნეგატიური</button>
         </div>
+        <button class="btn btn-p" style="width: 100%;" onclick="location.reload()">დახურვა</button>
+    </div>
 </div>
 
 <script>
-   // --- აქედან იწყება ჩასანაცვლებელი კოდი ---
+    let currentUser = JSON.parse(localStorage.getItem('hn_user')) || null;
+    let posts = JSON.parse(localStorage.getItem('hn_posts')) || [];
+    let tempRole = null;
+    let tempFile = null;
+    let activePostId = null;
 
-let currentUser = JSON.parse(localStorage.getItem('hn_user')) || null;
-let posts = JSON.parse(localStorage.getItem('hn_posts')) || [];
+    window.onload = () => {
+        if(currentUser) updateUI();
+        renderFeed();
+        if(currentUser && currentUser.role === 'seller') renderSellerDashboard();
+    };
 
-window.onload = () => { 
-    if(currentUser) updateUI(); 
-    renderFeed(); 
-    if(currentUser && currentUser.role === 'seller') renderSellerDashboard();
-};
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); tempFile = null; }
 
-// 1. გამყიდველის პანელი (სადაც ხედავს მყიდველის რეაქციას)
-function renderSellerDashboard() {
-    const dash = document.getElementById('seller-tools'); // ან შესაბამისი ID რაც გაქვს
-    if(!dash) return;
-    
-    let html = `<h3>ჩემი შეთავაზებების სტატუსი</h3><div style="display:grid; gap:10px; margin-top:10px;">`;
-    let hasOffers = false;
+    function setRole(r) {
+        tempRole = r;
+        document.getElementById('role-b').className = r === 'buyer' ? 'btn btn-p' : 'btn btn-outline';
+        document.getElementById('role-s').className = r === 'seller' ? 'btn btn-p' : 'btn btn-outline';
+    }
 
-    posts.forEach(p => {
+    function handleAuth() {
+        const name = document.getElementById('auth-user').value;
+        const email = document.getElementById('auth-email').value;
+        if(!tempRole || !name) return alert("გთხოვთ აირჩიოთ როლი და შეიყვანოთ სახელი");
+        currentUser = { name, email, role: tempRole, rating: 100 };
+        localStorage.setItem('hn_user', JSON.stringify(currentUser));
+        location.reload();
+    }
+
+    function logout() { localStorage.removeItem('hn_user'); location.reload(); }
+
+    function updateUI() {
+        document.getElementById('nav-guest').classList.add('hidden');
+        document.getElementById('nav-user').classList.remove('hidden');
+        document.getElementById('user-display-name').innerText = currentUser.name;
+        document.getElementById('user-display-role').innerText = currentUser.role === 'buyer' ? 'მყიდველი' : 'გამყიდველი';
+        document.getElementById('user-display-role').className = 'badge ' + (currentUser.role === 'buyer' ? 'status-pending' : 'status-accepted');
+        if(currentUser.role === 'buyer') document.getElementById('buyer-tools').classList.remove('hidden');
+        if(currentUser.role === 'seller') document.getElementById('seller-dashboard').classList.remove('hidden');
+    }
+
+    function handleFile(input, statusId) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => { tempFile = e.target.result; document.getElementById(statusId).innerText = "✅ მიმაგრებულია: " + file.name; };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function addPost() {
+        const post = {
+            id: Date.now(),
+            title: document.getElementById('p-title').value,
+            qty: document.getElementById('p-qty').value,
+            comm: document.getElementById('p-comm').value,
+            file: tempFile,
+            owner: currentUser.email,
+            ownerName: currentUser.name,
+            offers: [],
+            status: 'active'
+        };
+        posts.unshift(post);
+        save(); location.reload();
+    }
+
+    function renderFeed() {
+        const feed = document.getElementById('main-feed');
+        feed.innerHTML = posts.length === 0 ? '<p style="text-align:center; color:gray;">ბაზარი ცარიელია</p>' : '';
+        posts.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const isOwner = currentUser && p.owner === currentUser.email;
+            const canOffer = currentUser && currentUser.role === 'seller' && p.status === 'active';
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between">
+                    <h3>${p.title}</h3>
+                    <span class="badge status-pending">${p.qty}</span>
+                </div>
+                <p style="margin:10px 0;">${p.comm}</p>
+                ${p.file ? `<a href="${p.file}" download="file" style="color:var(--primary); font-size:0.8rem;"><i class="fas fa-paperclip"></i> ფაილის ნახვა</a>` : ''}
+                <div style="margin-top:1.5rem;">
+                    ${isOwner ? renderOffersForOwner(p) : (canOffer ? `<button class="btn btn-p" onclick="openOfferForm('${p.id}')">შეთავაზება</button>` : '')}
+                </div>
+            `;
+            feed.appendChild(card);
+        });
+    }
+
+    function openOfferForm(id) { activePostId = id; openModal('offer-modal'); }
+
+    function submitOffer() {
+        const pIdx = posts.findIndex(x => x.id == activePostId);
+        const offer = {
+            id: Date.now(),
+            sellerEmail: currentUser.email,
+            sellerName: currentUser.name,
+            price: document.getElementById('o-price').value,
+            curr: document.getElementById('o-curr').value,
+            comm: document.getElementById('o-comm').value,
+            file: tempFile,
+            status: 'pending'
+        };
+        posts[pIdx].offers.push(offer);
+        save(); location.reload();
+    }
+
+    function renderOffersForOwner(p) {
+        let html = `<strong>შემოსული შეთავაზებები:</strong>`;
+        if(p.offers.length === 0) html += `<p style="font-size:0.8rem; color:gray;">ჯერ არ არის</p>`;
         p.offers.forEach(o => {
-            if(o.sellerEmail === currentUser.email) {
-                hasOffers = true;
-                html += `
-                <div class="card" style="border-left: 5px solid ${getStatusColor(o.status)}">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>პოსტი: <b>${p.title}</b> | ფასი: <b>${o.price}</b></span>
-                        <span>სტატუსი: <b style="color:${getStatusColor(o.status)}">${o.status}</b></span>
+            html += `
+                <div class="offer-card">
+                    <div style="display:flex; justify-content:space-between">
+                        <b>${o.sellerName}</b>
+                        <b style="color:var(--primary)">${o.price} ${o.curr}</b>
                     </div>
-                    <div style="margin-top:10px;">
-                        ${o.status === 'accepted' ? `<button class="btn btn-s" onclick="finalConfirm('${p.id}', '${o.id}', 'seller')">საბოლოო დასტური (გამყიდველი)</button>` : ''}
-                        ${o.status === 'rejected' ? `<button class="btn btn-outline" onclick="openOffer('${p.id}')">თავიდან გაგზავნა</button>` : ''}
-                        ${o.status === 'counter' ? `<span>მყიდველმა შემოგთავაზათ სხვა ფასი. <button class="btn btn-s" onclick="updateStatus('${p.id}', '${o.id}', 'accepted')">დათანხმება</button></span>` : ''}
+                    <div style="margin-top:10px; display:flex; gap:10px;">
+                        ${o.status === 'pending' ? `
+                            <button class="btn btn-s" onclick="updateOfferStatus('${p.id}', '${o.id}', 'accepted')">დადასტურება</button>
+                            <button class="btn btn-d" onclick="updateOfferStatus('${p.id}', '${o.id}', 'rejected')">უარყოფა</button>
+                        ` : `<span>სტატუსი: <b>${o.status}</b></span>`}
+                        ${o.status === 'final_wait_buyer' ? `<button class="btn btn-p" onclick="openModal('rating-modal')">დასრულება და შეფასება</button>` : ''}
                     </div>
                 </div>`;
-            }
         });
-    });
-    
-    html += hasOffers ? `</div>` : `<p>ჯერ შეთავაზებები არ გაგიკეთებიათ</p></div>`;
-    dash.innerHTML = html;
-}
-
-// 2. სტატუსების ფერების მართვა
-function getStatusColor(status) {
-    switch(status) {
-        case 'accepted': return '#10B981';
-        case 'rejected': return '#EF4444';
-        case 'pending': return '#F59E0B';
-        case 'completed': return '#0052FF';
-        default: return '#64748B';
-    }
-}
-
-// 3. სტატუსის განახლება (მყიდველის მიერ)
-function updateStatus(pid, oid, stat) {
-    const pIdx = posts.findIndex(x => x.id == pid);
-    const oIdx = posts[pIdx].offers.findIndex(x => x.id == oid);
-    
-    posts[pIdx].offers[oIdx].status = stat;
-    
-    // თუ მყიდველმა დაადასტურა, გამყიდველს უნდა მიუვიდეს შეტყობინება (სტატუსის სახით)
-    save();
-    location.reload(); 
-}
-
-// 4. საბოლოო დასტურის ლოგიკა (ორივე მხარისთვის)
-function finalConfirm(pid, oid, role) {
-    const pIdx = posts.findIndex(x => x.id == pid);
-    const oIdx = posts[pIdx].offers.findIndex(x => x.id == oid);
-    
-    if(role === 'seller') {
-        posts[pIdx].offers[oIdx].sellerFinal = true;
-        posts[pIdx].offers[oIdx].status = 'საკოლოო დასტური (გამყიდველი)';
-    } else {
-        posts[pIdx].offers[oIdx].buyerFinal = true;
+        return html;
     }
 
-    // თუ ორივემ დაადასტურა - იხსნება შეფასება
-    if(posts[pIdx].offers[oIdx].sellerFinal && posts[pIdx].offers[oIdx].buyerFinal) {
-        posts[pIdx].offers[oIdx].status = 'completed';
-        openRatingModal(pid, oid); 
+    function renderSellerDashboard() {
+        const list = document.getElementById('my-offers-list');
+        list.innerHTML = '';
+        posts.forEach(p => {
+            p.offers.forEach(o => {
+                if(o.sellerEmail === currentUser.email) {
+                    const item = document.createElement('div');
+                    item.className = 'offer-card';
+                    item.innerHTML = `
+                        <div>პოსტი: <b>${p.title}</b> | ფასი: <b>${o.price} ${o.curr}</b></div>
+                        <div style="margin-top:5px;">სტატუსი: <b style="color:var(--primary)">${o.status}</b></div>
+                        ${o.status === 'accepted' ? `<button class="btn btn-s" style="margin-top:10px;" onclick="updateOfferStatus('${p.id}', '${o.id}', 'final_wait_buyer')">საბოლოო დასტური (გამყიდველი)</button>` : ''}
+                        ${o.status === 'rejected' ? `<button class="btn btn-outline" style="margin-top:10px;" onclick="openOfferForm('${p.id}')">თავიდან გაგზავნა</button>` : ''}
+                    `;
+                    list.appendChild(item);
+                }
+            });
+        });
     }
-    
-    save();
-    location.reload();
-}
 
-// 5. Binance-ის სტილის შეფასების ფანჯრის გახსნა
-function openRatingModal(pid, oid) {
-    // აქ იხსნება შენი Rating Modal, რომელიც უკვე გაქვს დიზაინში
-    const modal = document.getElementById('rating-modal');
-    if(modal) modal.classList.add('active');
-}
+    function updateOfferStatus(pid, oid, stat) {
+        const pIdx = posts.findIndex(x => x.id == pid);
+        const oIdx = posts[pIdx].offers.findIndex(x => x.id == oid);
+        posts[pIdx].offers[oIdx].status = stat;
+        save(); location.reload();
+    }
 
-function save() { localStorage.setItem('hn_posts', JSON.stringify(posts)); }
-
-// --- აქ მთავრდება ჩასანაცვლებელი კოდი ---
+    function save() { localStorage.setItem('hn_posts', JSON.stringify(posts)); }
 </script>
-
 </body>
 </html>
