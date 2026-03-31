@@ -7,12 +7,46 @@
 <style>
 body {background:#0f172a;color:white;font-family:Arial;margin:0;}
 header {display:flex;justify-content:space-between;padding:15px;background:#020617;}
-.logo {color:#22c55e;font-weight:bold;font-size:20px;}
+.logo {color:#22c55e;font-weight:bold;}
 .container {padding:20px;}
 .card {background:#020617;padding:15px;margin:10px 0;border-radius:10px;}
-button {background:#22c55e;border:none;padding:8px;margin-top:5px;cursor:pointer;}
-input,select,textarea {width:100%;margin:5px 0;padding:8px;}
+
+button {
+  background:#22c55e;
+  border:none;
+  padding:8px 12px;
+  margin-top:5px;
+  cursor:pointer;
+  border-radius:6px;
+}
+
+input, select, textarea {
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+  border-radius:6px;
+  border:none;
+}
+
 .hidden {display:none;}
+
+/* MODAL */
+.modal {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal-content {
+  background:#020617;
+  padding:20px;
+  border-radius:10px;
+  width:300px;
+}
 </style>
 
 </head>
@@ -26,7 +60,6 @@ input,select,textarea {width:100%;margin:5px 0;padding:8px;}
 
 <div class="container">
 
-<!-- ავტორიზაცია -->
 <div id="auth">
 <h3>შესვლა</h3>
 <input id="loginEmail" placeholder="მეილი">
@@ -46,18 +79,22 @@ input,select,textarea {width:100%;margin:5px 0;padding:8px;}
 <button onclick="register()">რეგისტრაცია</button>
 </div>
 
-<!-- აპი -->
 <div id="app" class="hidden">
 
 <div id="buyerPanel" class="hidden">
-<button onclick="addRequest()">მოთხოვნის დამატება</button>
+<button onclick="openRequestModal()">+ მოთხოვნა</button>
 </div>
 
-<h3>ყველა განცხადება</h3>
+<h3>განაცხადები</h3>
 <div id="list"></div>
 
 </div>
 
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal hidden">
+  <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script>
@@ -67,21 +104,20 @@ let requests = JSON.parse(localStorage.getItem("requests")) || [];
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 // INIT
-renderPublic();
 if(currentUser) showApp();
+renderRequests();
 
 // REGISTER
 function register(){
-  let user = {
+  users.push({
     username: regUser.value,
     email: regEmail.value,
     pass: regPass.value,
-    role: role.value
-  };
-
-  users.push(user);
+    role: role.value,
+    rating:5
+  });
   localStorage.setItem("users", JSON.stringify(users));
-  alert("დარეგისტრირდი!");
+  alert("დარეგისტრირდი");
 }
 
 // LOGIN
@@ -92,16 +128,10 @@ function login(){
     u.email === loginEmail.value && u.pass === loginPass.value
   );
 
-  if(!user) return alert("არასწორი მონაცემები");
+  if(!user) return alert("შეცდომა");
 
   localStorage.setItem("currentUser", JSON.stringify(user));
   showApp();
-}
-
-// LOGOUT
-function logout(){
-  localStorage.removeItem("currentUser");
-  location.reload();
 }
 
 // SHOW APP
@@ -111,113 +141,156 @@ function showApp(){
 
   currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  userPanel.innerHTML = `
-  ${currentUser.username} (${currentUser.role})
-  <button onclick="logout()">გასვლა</button>
-  `;
+  userPanel.innerHTML = `${currentUser.username} (${currentUser.role})
+  <button onclick="logout()">გასვლა</button>`;
 
-  if(currentUser.role === "buyer"){
+  if(currentUser.role==="buyer"){
     buyerPanel.classList.remove("hidden");
   }
 
   renderRequests();
 }
 
-// PUBLIC VIEW
-function renderPublic(){
-  renderRequests();
+// LOGOUT
+function logout(){
+  localStorage.removeItem("currentUser");
+  location.reload();
 }
 
-// ADD REQUEST
-function addRequest(){
-  let product = prompt("პროდუქტი");
-  let qty = prompt("რაოდენობა");
-  let comment = prompt("კომენტარი");
+// MODAL
+function openModal(html){
+  modalContent.innerHTML = html;
+  modal.classList.remove("hidden");
+}
+function closeModal(){
+  modal.classList.add("hidden");
+}
 
+// REQUEST FORM
+function openRequestModal(){
+  openModal(`
+    <h3>ახალი მოთხოვნა</h3>
+    <input id="prod" placeholder="პროდუქტი / სერვისი">
+    <input id="qty" placeholder="რაოდენობა">
+    <textarea id="comm" placeholder="კომენტარი"></textarea>
+    <input type="file">
+    <button onclick="createRequest()">დამატება</button>
+    <button onclick="closeModal()">გაუქმება</button>
+  `);
+}
+
+function createRequest(){
   requests.push({
-    id: Date.now(),
-    user: currentUser.username,
-    product,
-    qty,
-    comment,
+    id:Date.now(),
+    user:currentUser.username,
+    product:prod.value,
+    qty:qty.value,
+    comment:comm.value,
     offers:[]
   });
 
   localStorage.setItem("requests", JSON.stringify(requests));
+  closeModal();
   renderRequests();
 }
 
 // RENDER
 function renderRequests(){
-  list.innerHTML = "";
+  list.innerHTML="";
 
-  requests.forEach(r => {
+  requests.forEach(r=>{
+    let div=document.createElement("div");
+    div.className="card";
 
-    let div = document.createElement("div");
-    div.className = "card";
-
-    let html = `
-    <b>${r.product}</b> (${r.qty}) <br>
+    let html=`
+    <b>${r.product}</b> (${r.qty})<br>
     ${r.comment}<br>
     ავტორი: ${r.user}<br>
     შეთავაზებები: ${r.offers.length}<br>
     `;
 
-    // SELLER ხედავს შეთავაზების ღილაკს
-    if(currentUser && currentUser.role === "seller"){
-      html += `<button onclick="offer(${r.id})">შეთავაზება</button>`;
+    if(currentUser?.role==="seller"){
+      html+=`<button onclick="openOfferModal(${r.id})">შეთავაზება</button>`;
     }
 
-    // BUYER ხედავს საკუთარ შეთავაზებებს
-    if(currentUser && currentUser.username === r.user){
-      html += `<button onclick="viewOffers(${r.id})">ნახვა</button>`;
+    if(currentUser?.username===r.user){
+      html+=`<button onclick="viewOffers(${r.id})">ნახვა</button>`;
     }
 
-    div.innerHTML = html;
+    div.innerHTML=html;
     list.appendChild(div);
   });
 }
 
-// MAKE OFFER
-function offer(id){
-  let price = prompt("ფასი");
-  let comment = prompt("კომენტარი");
+// OFFER MODAL
+function openOfferModal(id){
+  openModal(`
+    <h3>შეთავაზება</h3>
+    <input id="price" placeholder="ფასი">
+    <select id="currency">
+      <option>GEL</option>
+      <option>USD</option>
+    </select>
+    <textarea id="comment" placeholder="კომენტარი"></textarea>
+    <input type="file">
+    <button onclick="sendOffer(${id})">გაგზავნა</button>
+  `);
+}
 
-  let req = requests.find(r => r.id === id);
+function sendOffer(id){
+  let req=requests.find(r=>r.id===id);
 
   req.offers.push({
-    seller: currentUser.username,
-    price,
-    comment,
+    seller:currentUser.username,
+    price:price.value,
+    currency:currency.value,
+    comment:comment.value,
     status:"pending"
   });
 
   localStorage.setItem("requests", JSON.stringify(requests));
+  closeModal();
   renderRequests();
 }
 
 // VIEW OFFERS
 function viewOffers(id){
-  let req = requests.find(r => r.id === id);
+  let req=requests.find(r=>r.id===id);
 
-  let text = "";
+  let html="<h3>შეთავაზებები</h3>";
 
   req.offers.forEach((o,i)=>{
-    text += `${i+1}. ${o.seller} - ${o.price} (${o.status})\n`;
+    html+=`
+    <div class="card">
+    ${o.seller} - ${o.price} ${o.currency}<br>
+    ${o.comment}<br>
+    სტატუსი: ${o.status}<br>
+    <button onclick="accept(${id},${i})">დადასტურება</button>
+    <button onclick="reject(${id},${i})">უარყოფა</button>
+    </div>
+    `;
   });
 
-  let choice = prompt(text + "\nაირჩიე ნომერი დასადასტურებლად");
+  html+=`<button onclick="closeModal()">დახურვა</button>`;
 
-  let offer = req.offers[choice-1];
-  if(!offer) return;
+  openModal(html);
+}
 
-  let action = prompt("1 - დადასტურება / 2 - უარყოფა");
-
-  if(action == 1) offer.status = "accepted";
-  if(action == 2) offer.status = "rejected";
+// ACTIONS
+function accept(id,i){
+  let req=requests.find(r=>r.id===id);
+  req.offers[i].status="accepted";
 
   localStorage.setItem("requests", JSON.stringify(requests));
-  renderRequests();
+  viewOffers(id);
+}
+
+function reject(id,i){
+  let req=requests.find(r=>r.id===id);
+  req.offers[i].status="rejected";
+
+  localStorage.setItem("requests", JSON.stringify(requests));
+  viewOffers(id);
 }
 
 </script>
