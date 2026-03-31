@@ -137,6 +137,7 @@ function register(){
 
 // LOGIN
 function login(){
+  users = JSON.parse(localStorage.getItem("users")) || [];
   let user = users.find(u => 
     u.email === loginEmail.value && u.pass === loginPass.value
   );
