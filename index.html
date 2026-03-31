@@ -10,27 +10,10 @@ header {display:flex;justify-content:space-between;padding:15px;background:#0206
 .logo {color:#22c55e;font-weight:bold;}
 .container {padding:20px;}
 .card {background:#020617;padding:15px;margin:10px 0;border-radius:10px;}
-
-button {
-  background:#22c55e;
-  border:none;
-  padding:8px 12px;
-  margin-top:5px;
-  cursor:pointer;
-  border-radius:6px;
-}
-
-input, select, textarea {
-  width:100%;
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
-  border:none;
-}
-
+button {background:#22c55e;border:none;padding:8px;margin-top:5px;cursor:pointer;border-radius:6px;}
+input, select, textarea {width:100%;padding:8px;margin:5px 0;border-radius:6px;border:none;}
 .hidden {display:none;}
 
-/* MODAL */
 .modal {
   position:fixed;
   top:0; left:0;
@@ -40,7 +23,6 @@ input, select, textarea {
   align-items:center;
   justify-content:center;
 }
-
 .modal-content {
   background:#020617;
   padding:20px;
@@ -80,14 +62,12 @@ input, select, textarea {
 </div>
 
 <div id="app" class="hidden">
-
 <div id="buyerPanel" class="hidden">
 <button onclick="openRequestModal()">+ მოთხოვნა</button>
 </div>
 
 <h3>განაცხადები</h3>
 <div id="list"></div>
-
 </div>
 
 </div>
@@ -104,16 +84,16 @@ let requests = JSON.parse(localStorage.getItem("requests")) || [];
 let currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
 // INIT
-if(currentUser) showApp();
+if(currentUser){ showApp(); }
 renderRequests();
 
 // REGISTER
 function register(){
   users.push({
-    username: regUser.value,
-    email: regEmail.value,
-    pass: regPass.value,
-    role: role.value,
+    username: document.getElementById("regUser").value,
+    email: document.getElementById("regEmail").value,
+    pass: document.getElementById("regPass").value,
+    role: document.getElementById("role").value,
     rating:5
   });
   localStorage.setItem("users", JSON.stringify(users));
@@ -125,30 +105,14 @@ function login(){
   users = JSON.parse(localStorage.getItem("users")) || [];
 
   let user = users.find(u =>
-    u.email === loginEmail.value && u.pass === loginPass.value
+    u.email === document.getElementById("loginEmail").value &&
+    u.pass === document.getElementById("loginPass").value
   );
 
-  if(!user) return alert("შეცდომა");
+  if(!user) return alert("არასწორი მონაცემები");
 
   localStorage.setItem("currentUser", JSON.stringify(user));
   showApp();
-}
-
-// SHOW APP
-function showApp(){
-  auth.classList.add("hidden");
-  app.classList.remove("hidden");
-
-  currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-  userPanel.innerHTML = `${currentUser.username} (${currentUser.role})
-  <button onclick="logout()">გასვლა</button>`;
-
-  if(currentUser.role==="buyer"){
-    buyerPanel.classList.remove("hidden");
-  }
-
-  renderRequests();
 }
 
 // LOGOUT
@@ -157,23 +121,40 @@ function logout(){
   location.reload();
 }
 
-// MODAL
-function openModal(html){
-  modalContent.innerHTML = html;
-  modal.classList.remove("hidden");
-}
-function closeModal(){
-  modal.classList.add("hidden");
+// SHOW APP
+function showApp(){
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+  document.getElementById("userPanel").innerHTML =
+    currentUser.username + " (" + currentUser.role + ")" +
+    `<button onclick="logout()">გასვლა</button>`;
+
+  if(currentUser.role==="buyer"){
+    document.getElementById("buyerPanel").classList.remove("hidden");
+  }
+
+  renderRequests();
 }
 
-// REQUEST FORM
+// MODAL
+function openModal(html){
+  document.getElementById("modalContent").innerHTML = html;
+  document.getElementById("modal").classList.remove("hidden");
+}
+function closeModal(){
+  document.getElementById("modal").classList.add("hidden");
+}
+
+// REQUEST
 function openRequestModal(){
   openModal(`
     <h3>ახალი მოთხოვნა</h3>
-    <input id="prod" placeholder="პროდუქტი / სერვისი">
+    <input id="prod" placeholder="პროდუქტი">
     <input id="qty" placeholder="რაოდენობა">
     <textarea id="comm" placeholder="კომენტარი"></textarea>
-    <input type="file">
     <button onclick="createRequest()">დამატება</button>
     <button onclick="closeModal()">გაუქმება</button>
   `);
@@ -181,11 +162,11 @@ function openRequestModal(){
 
 function createRequest(){
   requests.push({
-    id:Date.now(),
-    user:currentUser.username,
-    product:prod.value,
-    qty:qty.value,
-    comment:comm.value,
+    id: Date.now(),
+    user: currentUser.username,
+    product: document.getElementById("prod").value,
+    qty: document.getElementById("qty").value,
+    comment: document.getElementById("comm").value,
     offers:[]
   });
 
@@ -196,55 +177,50 @@ function createRequest(){
 
 // RENDER
 function renderRequests(){
-  list.innerHTML="";
+  let list = document.getElementById("list");
+  list.innerHTML = "";
 
   requests.forEach(r=>{
-    let div=document.createElement("div");
-    div.className="card";
+    let div = document.createElement("div");
+    div.className = "card";
 
-    let html=`
-    <b>${r.product}</b> (${r.qty})<br>
-    ${r.comment}<br>
-    ავტორი: ${r.user}<br>
-    შეთავაზებები: ${r.offers.length}<br>
+    let html = `
+      <b>${r.product}</b> (${r.qty})<br>
+      ${r.comment}<br>
+      ავტორი: ${r.user}<br>
+      შეთავაზებები: ${r.offers.length}<br>
     `;
 
-    if(currentUser?.role==="seller"){
-      html+=`<button onclick="openOfferModal(${r.id})">შეთავაზება</button>`;
+    if(currentUser && currentUser.role==="seller"){
+      html += `<button onclick="openOfferModal(${r.id})">შეთავაზება</button>`;
     }
 
-    if(currentUser?.username===r.user){
-      html+=`<button onclick="viewOffers(${r.id})">ნახვა</button>`;
+    if(currentUser && currentUser.username===r.user){
+      html += `<button onclick="viewOffers(${r.id})">ნახვა</button>`;
     }
 
-    div.innerHTML=html;
+    div.innerHTML = html;
     list.appendChild(div);
   });
 }
 
-// OFFER MODAL
+// OFFER
 function openOfferModal(id){
   openModal(`
     <h3>შეთავაზება</h3>
     <input id="price" placeholder="ფასი">
-    <select id="currency">
-      <option>GEL</option>
-      <option>USD</option>
-    </select>
-    <textarea id="comment" placeholder="კომენტარი"></textarea>
-    <input type="file">
+    <textarea id="comment"></textarea>
     <button onclick="sendOffer(${id})">გაგზავნა</button>
   `);
 }
 
 function sendOffer(id){
-  let req=requests.find(r=>r.id===id);
+  let req = requests.find(r=>r.id===id);
 
   req.offers.push({
-    seller:currentUser.username,
-    price:price.value,
-    currency:currency.value,
-    comment:comment.value,
+    seller: currentUser.username,
+    price: document.getElementById("price").value,
+    comment: document.getElementById("comment").value,
     status:"pending"
   });
 
@@ -253,42 +229,39 @@ function sendOffer(id){
   renderRequests();
 }
 
-// VIEW OFFERS
+// VIEW
 function viewOffers(id){
-  let req=requests.find(r=>r.id===id);
+  let req = requests.find(r=>r.id===id);
 
-  let html="<h3>შეთავაზებები</h3>";
+  let html = "<h3>შეთავაზებები</h3>";
 
   req.offers.forEach((o,i)=>{
-    html+=`
-    <div class="card">
-    ${o.seller} - ${o.price} ${o.currency}<br>
-    ${o.comment}<br>
-    სტატუსი: ${o.status}<br>
-    <button onclick="accept(${id},${i})">დადასტურება</button>
-    <button onclick="reject(${id},${i})">უარყოფა</button>
-    </div>
+    html += `
+      <div class="card">
+        ${o.seller} - ${o.price}<br>
+        ${o.comment}<br>
+        სტატუსი: ${o.status}<br>
+        <button onclick="accept(${id},${i})">დადასტურება</button>
+        <button onclick="reject(${id},${i})">უარყოფა</button>
+      </div>
     `;
   });
 
-  html+=`<button onclick="closeModal()">დახურვა</button>`;
-
+  html += `<button onclick="closeModal()">დახურვა</button>`;
   openModal(html);
 }
 
 // ACTIONS
 function accept(id,i){
-  let req=requests.find(r=>r.id===id);
+  let req = requests.find(r=>r.id===id);
   req.offers[i].status="accepted";
-
   localStorage.setItem("requests", JSON.stringify(requests));
   viewOffers(id);
 }
 
 function reject(id,i){
-  let req=requests.find(r=>r.id===id);
+  let req = requests.find(r=>r.id===id);
   req.offers[i].status="rejected";
-
   localStorage.setItem("requests", JSON.stringify(requests));
   viewOffers(id);
 }
